@@ -17,20 +17,16 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
     }
     @IBOutlet weak var lblMainscreen: UILabel!
     @IBOutlet weak var lblSubscreen: UILabel!
     
     var isCalc = false
     var isEqual = false
-    var isFirst = false
-    var isSecond = false
     var isFloat = false
     var firstValue:Double = 0.0
     var secondValue:Double = 0.0
-    var curVal:String = ""
+    var curVal:String = "0"
     var sign:String = ""
     @IBAction func btnClick(_ sender: UIButton) {
         
@@ -39,76 +35,97 @@ class ViewController: UIViewController {
         
         switch btnValue {
         case "+", "-", "×", "÷" :
-            if curVal == "INIT"{
+            if curVal == "inf"{
+                //Do nothing when inf show up
                 break
             }
-            if(isCalc == true){
+            if (isCalc){
+                // if user click equation two or more times
                 lblSubscreen.text = "\(Double(firstValue).removeZerosFromEnd()) \(btnValue) "
-                curVal = ""
+                curVal = "0"
                 lblMainscreen.text = "0"
             }
             else{
                 lblSubscreen.text = "\(Double(curVal)!.removeZerosFromEnd()) \(btnValue) "
                 firstValue = Double("\(curVal)")!
-                curVal = ""
+                curVal = "0"
                 lblMainscreen.text = "0"
                 isCalc = true
-                isEqual = true
+                isEqual = false
             }
             sign = btnValue
-
+            isFloat = false
             print("Calc")
         case "=" :
-            if curVal == "INIT"{
+            if (curVal == "inf"){
                 break
             }
-            if(isCalc == true){
-                lblSubscreen.text = "\(lblSubscreen.text!)\(curVal)"
+            if(isCalc == true && isEqual == false){
+                //when user click equation and then not yet click equal sign
+                lblSubscreen.text = "\(lblSubscreen.text!)\(Double(curVal)!.removeZerosFromEnd())"
                 secondValue = Double("\(curVal)")!
-                isEqual = false
+                isEqual = true
                 isCalc = false
-                curVal = calResult(s: sign)
+                isFloat = false
+                curVal = calResult(Equation: sign)
                 lblMainscreen.text = "\(curVal)"
-//                if (curVal == "INIT"){
-//                    clear()
-//                }
             }
             else{
+                //when user clicked equal two or more time with click number or other equation
                 print("Do Nothing")
             }
         case "C" :
             print("Clear")
             clear()
         case "+/-" :
-            if curVal == "INIT"{
+            if (curVal == "inf"){
                 break
             }
             print("Change +/-")
-            curVal = changeVal(a: (curVal as NSString).doubleValue)
-            lblMainscreen.text = Double(curVal)?.removeZerosFromEnd()
+            curVal = Double(changeVal(a: (curVal as NSString).doubleValue))!.removeZerosFromEnd()
+            lblMainscreen.text = "\(curVal)"
         case "%" :
-            if curVal == "INIT"{
+            if (curVal == "inf"){
                 break
             }
             print("Percent Tag")
             curVal = perc(a: (curVal as NSString).doubleValue)
             lblMainscreen.text = Double(curVal)?.removeZerosFromEnd()
         case "." :
-            if curVal == "INIT"{
-                break
-            }
-            isFloat = true
-            fallthrough
-        default:
-            if curVal == "INIT"{
+            if (isCalc == false && isEqual == true){
                 clear()
             }
-            curVal = "\(curVal)\(btnValue)"
-            lblMainscreen.text = Double(curVal)?.removeZerosFromEnd()
+            
+            if (curVal == "inf"){
+                break
+            }
+            if (floor((curVal as NSString).doubleValue) == (curVal as NSString).doubleValue && !isFloat){
+                curVal = "\(curVal)."
+                lblMainscreen.text = "\(curVal)"
+                isFloat = true
+            }
+        default:
+            if (curVal.count > 10){
+                break
+            }
+            if (isCalc == false && isEqual == true){
+                clear()
+            }
+            if (curVal == "inf"){
+                clear()
+            }
+            if (curVal == "0"){
+                curVal = "\(btnValue)"
+            }
+            else{
+                curVal = "\(curVal)\(btnValue)"
+            }
+            lblMainscreen.text = "\(curVal)"
         }
     }
     
-    func calResult(s : String)->String{
+    //Switch For Equation Sign
+    func calResult(Equation s : String)->String{
         switch s {
         case "+":
             print("Plus")
@@ -122,7 +139,8 @@ class ViewController: UIViewController {
         case "÷":
             print("Div")
             let res = Div(a: firstValue, b: secondValue);
-            if(res == "INIT"){
+            if (res == "inf"){
+                // if return result is inf, we return it otherwise, remove zero from the end
                 return res
             }
             else{
@@ -132,6 +150,7 @@ class ViewController: UIViewController {
             return "None"
         }
     }
+    //End Switch Equation Sign
     
     func Sum (a : Double, b : Double) -> String{
         return "\(a + b)"
@@ -151,11 +170,8 @@ class ViewController: UIViewController {
     }
     
     func Div (a : Double, b : Double) -> String{
-        if (a == 0){
-            return "0"
-        }
-        else if (b == 0){
-            return "INIT"
+        if (b == 0){
+            return "inf"
         }
         else{
             return "\(a/b)"
@@ -163,7 +179,7 @@ class ViewController: UIViewController {
     }
     
     func perc (a : Double) -> String{
-        if(a == 0){
+        if (a == 0){
             return "0"
         }
         else{
@@ -172,7 +188,7 @@ class ViewController: UIViewController {
     }
     
     func changeVal (a : Double) -> String{
-        if(a == 0){
+        if (a == 0){
             return "0"
         }
         else{
@@ -185,15 +201,13 @@ class ViewController: UIViewController {
         lblSubscreen.text = ""
         isCalc = false
         isEqual = false
-        isFirst = false
-        isSecond = false
         isFloat = false
         firstValue = 0.0
         secondValue = 0.0
         curVal = "0"
         sign = ""
     }
-    
+// End class ViewController
 }
 
 extension Double {
@@ -201,7 +215,7 @@ extension Double {
         let formatter = NumberFormatter()
         let number = NSNumber(value: self)
         formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 16 //maximum digits in Double after dot (maximum precision)
+        formatter.maximumFractionDigits = 9 //maximum digits in Double after dot (maximum precision)
         return String(formatter.string(from: number) ?? "")
     }
 }
