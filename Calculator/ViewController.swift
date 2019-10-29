@@ -39,6 +39,9 @@ class ViewController: UIViewController {
         
         switch btnValue {
         case "+", "-", "×", "÷" :
+            if curVal == "INIT"{
+                break
+            }
             if(isCalc == true){
                 lblSubscreen.text = "\(Double(firstValue).removeZerosFromEnd()) \(btnValue) "
                 curVal = ""
@@ -56,6 +59,9 @@ class ViewController: UIViewController {
 
             print("Calc")
         case "=" :
+            if curVal == "INIT"{
+                break
+            }
             if(isCalc == true){
                 lblSubscreen.text = "\(lblSubscreen.text!)\(curVal)"
                 secondValue = Double("\(curVal)")!
@@ -63,30 +69,40 @@ class ViewController: UIViewController {
                 isCalc = false
                 curVal = calResult(s: sign)
                 lblMainscreen.text = "\(curVal)"
-                if (curVal == "INIT"){
-                    clear()
-                }
+//                if (curVal == "INIT"){
+//                    clear()
+//                }
             }
             else{
                 print("Do Nothing")
             }
         case "C" :
             print("Clear")
-            lblMainscreen.text = "0"
-            lblSubscreen.text = ""
             clear()
         case "+/-" :
+            if curVal == "INIT"{
+                break
+            }
             print("Change +/-")
             curVal = changeVal(a: (curVal as NSString).doubleValue)
             lblMainscreen.text = Double(curVal)?.removeZerosFromEnd()
         case "%" :
+            if curVal == "INIT"{
+                break
+            }
             print("Percent Tag")
             curVal = perc(a: (curVal as NSString).doubleValue)
             lblMainscreen.text = Double(curVal)?.removeZerosFromEnd()
         case "." :
+            if curVal == "INIT"{
+                break
+            }
             isFloat = true
             fallthrough
         default:
+            if curVal == "INIT"{
+                clear()
+            }
             curVal = "\(curVal)\(btnValue)"
             lblMainscreen.text = Double(curVal)?.removeZerosFromEnd()
         }
@@ -165,6 +181,8 @@ class ViewController: UIViewController {
     }
     
     func clear () -> Void{
+        lblMainscreen.text = "0"
+        lblSubscreen.text = ""
         isCalc = false
         isEqual = false
         isFirst = false
