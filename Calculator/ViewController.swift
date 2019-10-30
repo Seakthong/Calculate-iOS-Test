@@ -228,7 +228,8 @@ extension Double {
         let formatter = NumberFormatter()
         let number = NSNumber(value: self)
         formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 9 //maximum digits in Double after dot (maximum precision)
+        formatter.maximumFractionDigits = 6 //maximum digits in Double after dot (maximum precision)
+        formatter.maximumIntegerDigits = 12
         return String(formatter.string(from: number) ?? "")
     }
 }
