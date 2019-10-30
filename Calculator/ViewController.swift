@@ -34,9 +34,9 @@ class ViewController: UIViewController {
         print(btnValue)
         
         switch btnValue {
-        case "+", "-", "×", "÷" :
-            if curVal == "inf"{
-                //Do nothing when inf show up
+        case "+", "-", "×", "÷", "%" :
+            if curVal == "NaN"{
+                //Do nothing when NaN show up
                 break
             }
             if (isCalc){
@@ -57,7 +57,7 @@ class ViewController: UIViewController {
             isFloat = false
             print("Calc")
         case "=" :
-            if (curVal == "inf"){
+            if (curVal == "NaN"){
                 break
             }
             if(isCalc == true && isEqual == false){
@@ -78,25 +78,25 @@ class ViewController: UIViewController {
             print("Clear")
             clear()
         case "+/-" :
-            if (curVal == "inf"){
+            if (curVal == "NaN"){
                 break
             }
             print("Change +/-")
             curVal = Double(changeVal(a: (curVal as NSString).doubleValue))!.removeZerosFromEnd()
             lblMainscreen.text = "\(curVal)"
-        case "%" :
-            if (curVal == "inf"){
-                break
-            }
-            print("Percent Tag")
-            curVal = perc(a: (curVal as NSString).doubleValue)
-            lblMainscreen.text = Double(curVal)?.removeZerosFromEnd()
+//        case "%" :
+//            if (curVal == "NaN"){
+//                break
+//            }
+//            print("Percent Tag")
+//            curVal = perc(a: (curVal as NSString).doubleValue)
+//            lblMainscreen.text = Double(curVal)?.removeZerosFromEnd()
         case "." :
             if (isCalc == false && isEqual == true){
                 clear()
             }
             
-            if (curVal == "inf"){
+            if (curVal == "NaN"){
                 break
             }
             if (floor((curVal as NSString).doubleValue) == (curVal as NSString).doubleValue && !isFloat){
@@ -111,7 +111,7 @@ class ViewController: UIViewController {
             if (isCalc == false && isEqual == true){
                 clear()
             }
-            if (curVal == "inf"){
+            if (curVal == "NaN"){
                 clear()
             }
             if (curVal == "0"){
@@ -127,40 +127,43 @@ class ViewController: UIViewController {
     //Switch For Equation Sign
     func calResult(Equation s : String)->String{
         switch s {
-        case "+":
+        case "+" :
             print("Plus")
-            return Double(Sum(a: firstValue, b: secondValue))!.removeZerosFromEnd()
-        case "-":
+            return Double(sum(a: firstValue, b: secondValue))!.removeZerosFromEnd()
+        case "-" :
             print("Minus")
-            return Double(Minus(a: firstValue, b: secondValue))!.removeZerosFromEnd()
-        case "×":
+            return Double(minus(a: firstValue, b: secondValue))!.removeZerosFromEnd()
+        case "×" :
             print("Multi")
-            return Double(Multi(a: firstValue, b: secondValue))!.removeZerosFromEnd()
-        case "÷":
+            return Double(multi(a: firstValue, b: secondValue))!.removeZerosFromEnd()
+        case "÷" :
             print("Div")
-            let res = Div(a: firstValue, b: secondValue);
-            if (res == "inf"){
-                // if return result is inf, we return it otherwise, remove zero from the end
+            let res = div(a: firstValue, b: secondValue);
+            if (res == "NaN"){
+                // if return result is NaN, we return it otherwise, remove zero from the end
                 return res
             }
             else{
                 return Double(res)!.removeZerosFromEnd()
             }
+        case "%" :
+            print("Modulo")
+            return (modulo(a: firstValue, b: secondValue)) as String
         default:
             return "None"
         }
     }
     //End Switch Equation Sign
     
-    func Sum (a : Double, b : Double) -> String{
+    func sum (a : Double, b : Double) -> String{
         return "\(a + b)"
     }
     
-    func Minus (a : Double, b : Double) -> String{
+    func minus (a : Double, b : Double) -> String{
         return "\(a - b)"
     }
     
-    func Multi (a : Double, b : Double) -> String{
+    func multi (a : Double, b : Double) -> String{
         if (a == 0 || b == 0){
             return "0"
         }
@@ -169,12 +172,22 @@ class ViewController: UIViewController {
         }
     }
     
-    func Div (a : Double, b : Double) -> String{
+    func div (a : Double, b : Double) -> String{
         if (b == 0){
-            return "inf"
+            return "NaN"
         }
         else{
             return "\(a/b)"
+        }
+    }
+    
+    func modulo (a : Double, b : Double) -> String{
+        if (floor(a) != a || floor(b) != b || b == 0){
+            return "NaN"
+        }
+        else{
+            print("Number Modulo" ,Int(a), Int(b))
+            return "\(Int(a)%Int(b))"
         }
     }
     
