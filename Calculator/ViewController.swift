@@ -5,7 +5,12 @@
 //  Created by Soeng Saravit on 10/25/17.
 //  Copyright © 2017 Soeng Saravit. All rights reserved.
 //
-
+/*
+    Read Me :)
+    - Option : use + - * / continuous
+        cannot + - * / with/by zero (condition in line 47)
+        if want to + - * / with zero, user can use with = operator (switch to case "=" : )
+ */
 import UIKit
 
 class ViewController: UIViewController {
@@ -31,7 +36,7 @@ class ViewController: UIViewController {
     @IBAction func btnClick(_ sender: UIButton) {
         
         let btnValue = sender.titleLabel!.text!
-        print(btnValue)
+        //print(btnValue)
         
         switch btnValue {
         case "+", "-", "×", "÷", "%" :
@@ -39,13 +44,23 @@ class ViewController: UIViewController {
                 //Do nothing when NaN show up
                 break
             }
-            if (isCalc){
-                // if user click equation two or more times
+            
+            if (isCalc && lblMainscreen.text == "0"){
+                // if user click equation two or more times but mainscreen is not equal to zero
                 lblSubscreen.text = "\(Double(firstValue).removeZerosFromEnd()) \(btnValue) "
                 curVal = "0"
                 lblMainscreen.text = "0"
+                
             }
             else{
+                if(isCalc == true && isEqual == false){
+                    equal()
+                }
+                else{
+                    //when user clicked equal two or more time with click number or other equation
+                    //print("Do Nothing")
+                    print("")
+                }
                 lblSubscreen.text = "\(Double(curVal)!.removeZerosFromEnd()) \(btnValue) "
                 firstValue = Double("\(curVal)")!
                 curVal = "0"
@@ -55,36 +70,30 @@ class ViewController: UIViewController {
             }
             sign = btnValue
             isFloat = false
-            print("Calc")
+            //print("Calc")
         case "=" :
             if (curVal == "NaN"){
                 break
             }
             if(isCalc == true && isEqual == false){
-                //when user click equation and then not yet click equal sign
-                lblSubscreen.text = "\(lblSubscreen.text!)\(Double(curVal)!.removeZerosFromEnd())"
-                secondValue = Double("\(curVal)")!
-                isEqual = true
-                isCalc = false
-                isFloat = false
-                curVal = calResult(Equation: sign)
-                lblMainscreen.text = "\(curVal)"
+                equal()
             }
             else{
                 //when user clicked equal two or more time with click number or other equation
-                print("Do Nothing")
+                //print("Do Nothing")
+                print("")
             }
         case "C" :
-            print("Clear")
+            //print("Clear")
             clear()
         case "+/-" :
             if (curVal == "NaN"){
                 break
             }
-            print("Change +/-")
+            //print("Change +/-")
             curVal = Double(changeVal(a: (curVal as NSString).doubleValue))!.removeZerosFromEnd()
             lblMainscreen.text = "\(curVal)"
-//        case "%" :
+//        case "%" : // calculate number with percent tag
 //            if (curVal == "NaN"){
 //                break
 //            }
@@ -108,12 +117,12 @@ class ViewController: UIViewController {
             if (curVal.count > 10){
                 break
             }
-            if (isCalc == false && isEqual == true){
+            if ((isCalc == false && isEqual == true) || curVal == "NaN"){
                 clear()
             }
-            if (curVal == "NaN"){
-                clear()
-            }
+//            if (curVal == "NaN"){
+//                clear()
+//            }
             if (curVal == "0"){
                 curVal = "\(btnValue)"
             }
@@ -128,16 +137,16 @@ class ViewController: UIViewController {
     func calResult(Equation s : String)->String{
         switch s {
         case "+" :
-            print("Plus")
+            //print("Plus")
             return Double(sum(a: firstValue, b: secondValue))!.removeZerosFromEnd()
         case "-" :
-            print("Minus")
+            //print("Minus")
             return Double(minus(a: firstValue, b: secondValue))!.removeZerosFromEnd()
         case "×" :
-            print("Multi")
+            //print("Multi")
             return Double(multi(a: firstValue, b: secondValue))!.removeZerosFromEnd()
         case "÷" :
-            print("Div")
+            //print("Div")
             let res = div(a: firstValue, b: secondValue);
             if (res == "NaN"){
                 // if return result is NaN, we return it otherwise, remove zero from the end
@@ -147,7 +156,7 @@ class ViewController: UIViewController {
                 return Double(res)!.removeZerosFromEnd()
             }
         case "%" :
-            print("Modulo")
+            //print("Modulo")
             return (modulo(a: firstValue, b: secondValue)) as String
         default:
             return "None"
@@ -186,7 +195,7 @@ class ViewController: UIViewController {
             return "NaN"
         }
         else{
-            print("Number Modulo" ,Int(a), Int(b))
+            //print("Number Modulo" ,Int(a), Int(b))
             return "\(Int(a)%Int(b))"
         }
     }
@@ -207,6 +216,16 @@ class ViewController: UIViewController {
         else{
             return "\(-1*a)"
         }
+    }
+    
+    func equal () -> Void{
+        lblSubscreen.text = "\(lblSubscreen.text!)\(Double(curVal)!.removeZerosFromEnd())"
+        secondValue = Double("\(curVal)")!
+        isEqual = true
+        isCalc = false
+        isFloat = false
+        curVal = calResult(Equation: sign)
+        lblMainscreen.text = "\(curVal)"
     }
     
     func clear () -> Void{
